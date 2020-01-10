@@ -2,21 +2,42 @@
 collection
 ##########
 
+##########
+overview
+##########
+move data into AWS
+
+real time > immediate action
+kinesis data streams
+SQS
+IoT
+
+near-real time > reactive action
+kinesis firehose
+DMS
+
+batch = historical analysis
+Snowball
+Data pipeline
+
+##########
 kinesis
+##########
 managed Kafka
 data is automatically replicated sychronously to 3 AZ
 
 kinesis streams
 low latency streaming ingest at scale
 divided into shards (aka partitions)
+consumers read data from the shards
 data retention default = 24 hrs, max 7 days
 ability to reprocess / replay data
-
 
 kinesis analytics 
 perform real-time analytics on streams using SQL
 
 kinesis firehose
 load streams in S3, Redshift, ElasticSearch, Splunk
+
 
 

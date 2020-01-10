@@ -1,0 +1,71 @@
+#############
+Visualization
+#############
+
+Quicksight
+
+Some Data sources incude
+# Redshift 
+# Athena
+# File in S3
+
+Data prep allows for limited ETL
+# change column names
+# issue SQL queries to transform
+# change data types
+For bigger ETL use glue
+
+Import data into SPICE
+Accelerate queries on large data sets
+
+Each user gets 10GB of SPICE
+Scales up to 100+ of users
+
+Use cases
+# Ad-hoc exploration / visualization
+# Dashboards
+# Stories - like a slide show, Tableau style
+guided stories through specific views of analysis
+convey key points, evolution of an analysis over time
+
+Security
+# MFA
+# VPC connectivity
+# Row level security 
+# Private VPC access
+
+User management
+users created via IAM or email signup
+Active directory integration = Enterprise edition
+
+Dashboards
+# READ ONLY snapshot of an analysis - other users can't edit
+# put together charts + graphs
+# automatically refresh
+
+Machine Learning insights
+# ML powered anomaly detection
+uses Random Cut Forest
+identify top contributors to significant changes in metrics
+# ML powered forecasting
+also uses Random Cut Forest
+detects seasonal + longer term trends
+excludes outliers and imputes missing values
+# Autonarratives
+# Suggested insights
+
+Visual types
+# AutoGraph - AWS tries to figure out the appropriate visual for you
+# Bar chart - comparison of quantities
+histogram - bucket things together by certain ranges
+# Line graph - changes over time
+# Scatter plot + heat map - correlation between 2+ attributes 
+# Pie graph - how pieces add up to a whole
+# Tree maps - hierarchical pie charts
+# Pivot table - slicing + dicing tabular data
+# Stories - Capture button - evolution of an analysis
+# KPIs - compare key to target value
+# Geospatial charts - maps with dots
+# Donut charts - similar to pie chart, based on percentages, good to use for revenue reports
+# Gauge charts - how much of something you are using (ex: amount of fuel in your tank) 
+# Word clouds - size of word = how often it appears
