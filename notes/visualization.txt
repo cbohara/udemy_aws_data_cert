@@ -18,6 +18,7 @@ For bigger ETL use glue
 Import data into SPICE
 Accelerate queries on large data sets
 
+
 Each user gets 10GB of SPICE
 Scales up to 100+ of users
 

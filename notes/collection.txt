@@ -8,36 +8,94 @@ overview
 move data into AWS
 
 real time > immediate action
-kinesis data streams
-SQS
-IoT
+# kinesis data streams
+# SQS
+# IoT
 
 near-real time > reactive action
-kinesis firehose
-DMS
+# kinesis firehose
+# DMS
 
 batch = historical analysis
-Snowball
-Data pipeline
+# Snowball
+# Data pipeline
 
 ##########
-kinesis
-##########
-managed Kafka
-data is automatically replicated sychronously to 3 AZ
-
 kinesis streams
-low latency streaming ingest at scale
-divided into shards (aka partitions)
-consumers read data from the shards
-data retention default = 24 hrs, max 7 days
-ability to reprocess / replay data
+##########
+managed alternative to Kafka
+great for real-time big data
+data is automatically replicated syncronously in 3 AZ
 
-kinesis analytics 
-perform real-time analytics on streams using SQL
+streams
+made up of shards/partitions
+producer > stream containing many shards > consumer
+default only stores 24 hours but can retain up to 7 days
+can reprocess/replay data as long as it is available in the stream 
+so multiple applications can be reading from the same stream
+it is an append only data store - the data within kinesis stream is immutable
 
-kinesis firehose
-load streams in S3, Redshift, ElasticSearch, Splunk
+shards
+one stream is made of many shards
+billed per shard
+# of shards per stream can change (reshard or merge)
+records are ordered per shard based on when they are received 
 
+records contain
+1. data blob
+up to 1 MB
+serialized as bytes so contain whatever you want
 
+2. record key
+sent along with the data blob
+provided by producer
+helps group records in shards
+same key = same shard
+use highly distributed key to avoid hot partition problem
 
+3. sequence number 
+added by kinesis, not by the producer
+unique ID for each record in the shard
+
+producer limits
+1 MB or 1000 messages/sec at write per shard
+if you exceed this then you will receive a ProvisionedThoroughputException error
+
+consumer classic
+2MB/second per shard across all the consumers
+OR 
+5 API calls per second per shard across all the consumers
+
+consumer enhanced fan out
+2MB/second per read per shard per enhanced consumer
+No API calls needed - uses a push model 
+better scaling
+
+data retention
+24 hours by default
+can extend to 7 days
+
+producers
+kinesis SDK - can use boto library
+kinesis producer library (KPL) - more advanced, better code, enhanced thoroughput
+kinesis agent - linux program that runs on servers - allows you to get log file + send to kinesis stream
+third party libraries - spark
+
+kinesis SDK
+PutRecord or PutRecords 
+PutRecords uses batching = better thoroughput
+but have to be careful to avoid ProvisionedThoroughputExceeded error 
+use cases - lower thoroughput, higher latency, simple API, AWS lambda
+
+managed services for kinesis data streams 
+use SDK behind the scenes
+include CloudWatch Logs, AWS IoT, and Kinesis Data Analytics
+
+ProvisionedThoroughputException
+exceeding # of MB/second or records/second for any shard
+need to avoid a hot partition
+need to distribute as much as possible to avoid hot partition
+solution
+1. add retries with backoffs
+2. increase # of shards
+3. ensure you have a good partition key
