@@ -27,7 +27,7 @@ managed alternative to Kafka
 great for real-time big data
 data is automatically replicated syncronously in 3 AZ
 
-streams
+streams - low latency to ingest at scale
 made up of shards/partitions
 producer > stream containing many shards > consumer
 default only stores 24 hours but can retain up to 7 days
@@ -75,7 +75,9 @@ data retention
 24 hours by default
 can extend to 7 days
 
-producers
+########
+kinesis producers
+########
 kinesis SDK - can use boto library
 kinesis producer library (KPL) - more advanced, better code, enhanced thoroughput
 kinesis agent - linux program that runs on servers - allows you to get log file + send to kinesis stream
@@ -99,3 +101,60 @@ solution
 1. add retries with backoffs
 2. increase # of shards
 3. ensure you have a good partition key
+ex: instead of using ios or android as a key, use the device ID
+
+kinesis KPL
+C++/Java library
+high performance, long-running producers
+automated and configurable retry mechanism built in
+synchronous (same as SDK) or asynchronous (better performance) API
+compression is not available out of the box
+submits metrics to CloudWatch for monitoring
+*supports batching*
+aggregate a bunch of tiny records up to 1 MB and then post to kinesis stream as 1 API call
+we can influence batching efficiency by introducing some delay with RecordMaxBufferedTime (default 100ms) so some latentecy with the tradeoff of being more efficient
+
+kinesis agent
+install on Linux-based server environments only
+monitor log files + send to kinesis data streams
+built on top of the KPL
+you can even preprocess data before sending to stream
+emit metrics to CloudWatch for monitoring
+
+#####
+kinesis consumers
+#####
+Kinesis SDK (boto3)/CLI
+Kinesis Client Library (KCL)
+Kinesis Connector Library
+3rd party libraries - Spark
+Kinesis Firehose
+Lambda
+
+GetRecords
+Consumer SDK - GetRecords
+Classic 
+records are polled by consumers from the shard
+polling because the consumer makes a GetRecords() request and then ingests the data
+each shard has 2MB total aggregate throughput per second
+however can return a total of up to 10 MB of data
+if 10MB is rturned then you have to wait 5 seconds before the next call 
+or you can pull upto 10,000 records 
+
+max 5 GetRecords API calls per shard per second
+200ms latency
+
+if 5 consumer applications consume from the same shard, then each consumer can poll once per second and receive less than 400 KB/second
+all consumers share the same limit of 2MB per shard and 5 GetRecords API calls per second
+
+Kinesis Client Library (KCL)
+Java First, but exists for Python
+Read records produced by KPL and performs de-aggregation
+
+know that the kinsis connector library exists
+although it is pretty much deprecated now
+
+lambda consumer
+has a library to take care of de-aggregating records from the kinesis producer library
+used to run lightweight ETL 
+Lambda has a configurable batch size to manage thoroughput
