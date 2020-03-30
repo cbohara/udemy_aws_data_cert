@@ -192,3 +192,15 @@ can enable encryption in flight using HTTPS endpoint
 add encryption at rest using KMS
 encrypt message client side is hard
 VPC endpoint available to access Kinesis not on public internet but within private VPN
+
+######
+kinesis firehose
+######
+fully managed service
+near real time because there is a 60 second latency minimum if the batch is not full
+load data into redshift, redshift, s3, or splunk
+automatic scaling
+no data storage = only data transfer
+
+
+
