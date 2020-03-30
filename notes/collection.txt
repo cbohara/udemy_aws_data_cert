@@ -158,3 +158,37 @@ lambda consumer
 has a library to take care of de-aggregating records from the kinesis producer library
 used to run lightweight ETL 
 Lambda has a configurable batch size to manage thoroughput
+
+kinesis enhanced fanout
+works with Kinesis Consumer Library 2.0 and lambda
+each consumer gets 2mb/s of provisioned thoroughput per shard
+no longer need to poll for data
+after running SubscribeToShard() the shard will automatically push data 
+reduce latency ~70 seconds
+
+#####
+kinesis scaling
+#####
+adding shards = shard splitting
+you can divide hot shards which will terminate the hot shard and create 2 new ones
+an old shard is active until all the data is expired 
+
+merge shards 
+decrease stream capacity and reduce costs
+can be used to merge 2 shards with low traffic
+old shards will be closed and deleted after all data has expired 
+
+autoscaling
+not a native feature of kinesis
+have to do it manually
+
+can only perform one sharding operation at a time and it takes a few seconds
+for 1000 shards it takes over 8 hours to double the shards to 2000
+kinesis scaling takes time
+
+kinesis security
+control access/auth with IAM
+can enable encryption in flight using HTTPS endpoint
+add encryption at rest using KMS
+encrypt message client side is hard
+VPC endpoint available to access Kinesis not on public internet but within private VPN
