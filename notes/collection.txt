@@ -202,5 +202,51 @@ load data into redshift, redshift, s3, or splunk
 automatic scaling
 no data storage = only data transfer
 
+######
+SQS
+######
+fully managed
+scales from 1 message to 10,000 message per second
+default retention 4 days can be up to 14 days
+no limit to # of messages in queue
+low latency (<10ms on publish and receive)
+can have duplicate messages
+can have out of order messages (best effort ordering) - although now offer FIFO option
+265kb per message sent
 
+SQS consumers
+poll SQS for messages - up to 10 messages at a time
+need to process the message within the visibility timeout period  - this is the time in which the message is invisible to otheer consumers 
+the consumer must delete the message using the message ID and receipt handle
 
+what if you want to send messages larger than 256kb?
+SQS extended client = Java library
+producer - send large message to S3 + send small metadata message to SQS
+consumer - reads small metadata message + reads large S3 file
+
+SQS limits
+120,000 in-flight messages (received from a queue by a consumer, but not yet deleted from the queue)
+10 messages per batch
+each message max size of 256KB
+message content is text
+standard queues have unlimited transactions per second
+FIFO queue supports 300 operations per second (with up to 10 messages per batch)
+
+SQS security
+encryption in fight using HTTPS endpoint
+enable server side encryption (SSE) using KMS (key management service) - only encrypts the body not the metadata
+
+SQS vs Kinesis
+SQS messages can NOT be processed by multiple consumer applications
+used to decouple applications
+dynamic scaling of load (no-ops)
+256KB max
+
+Kinesis is a better option when working with multiple consumer applications
+data will be deleted after the retention period
+ordering of records per shard record
+pub/sub 
+streaming maprduce querying capability
+checkpointing available via kinesis client library
+shards (capacity) must be provided ahead of time
+1MB max
