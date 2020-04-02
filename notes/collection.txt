@@ -250,3 +250,35 @@ streaming maprduce querying capability
 checkpointing available via kinesis client library
 shards (capacity) must be provided ahead of time
 1MB max
+
+######
+IoT
+######
+https://aws.amazon.com/iot-core/features/
+we deploy IoT things = lightbulb, car, etc
+we want to configure them and receive data from them
+IoT registered in Thing registery
+IoT thing needs to communicate to the cloud via Device gateway = managed service
+IoT thing > send message to IoT message broker > send message to destination 
+destinations can include
+- IoT rule engine > send message to Kinesis, SQS, Lambda, etc
+- Device Shadow - can communicate back to device
+
+IoT rule engine
+can define how to modify the behavior of your devices
+actions = send events to other targets like lambda or database
+
+supports MQTT, Websockets, or HTTP 1.1 protocols
+
+authentication
+IoT policies are JSON documents that are attached to IoT things that manage X.509 certificates or Cognito identities
+
+rules engine
+rules = when it's triggered
+action = what it does
+IoT topic > Iot rule > Iot rule action > AWS services
+
+IoT greengrass
+brings compute layer directly to the device
+can run lambda functions directly on your device!
+
