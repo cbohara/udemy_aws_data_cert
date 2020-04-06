@@ -1,0 +1,106 @@
+#####
+S3
+#####
+If your file is larger than 5GB, you must use multi-part upload
+If your file is larger than 100MB, you should use it
+
+Read after write consistency for PUTS of new S3 objects
+As soon as the object is written, we can retrieve it
+PUT 200 > GET 200
+*Except if we did a GET before to see if the object exists
+GET 404 > PUT 200 > GET 404 = eventually consistent
+
+Eventual consistency for DELETES and PUTS of existing S3 objects
+PUT 200 > PUT 200 (update) > GET 200 (older version of object)
+DELETE 200 > GET 200 (eventually consistency = eventually delete)
+
+####
+S3 Storage Tiers
+####
+Make available while min cost
+
+S3 Standard - General Purpose
+Extremely high durability (11 9s)
+Availability 4 9s (99.99%)
+Sustain 2 concurrent facility failures - aka stored in 3 AZ
+Use cases - big data analytics, mobiling + gaming apps, content distribution
+
+S3 Reduced Redundancy Storage (RRS) 
+Deprecated but may still be on exam
+Durability 4 9s (99.99%)
+Availability 4 9s (99.99%)
+Sustain loss of data in a single facility  - akastored in 2 AZ
+Use cases - noncritical, reproducible data at lower levels of redundancy 
+
+S3 Infrequent Access (IA)
+Data that is less frequently accessed, but requires rapid access when needed
+Ex: Perform monthy analysis on some data = good use case vs perform analysis every 5 minutes = bad use case 
+Extremely high durability (11 9s)
+Sustain 2 concurrent facility failures - aka stored in 3 AZ
+Low availability 99.9%
+Low cost compared to S3 standard
+Use as a data store for disaster recovery, backups
+
+S3 One Zone - Infrequent Access (IA)
+Same as IA but all data is stored in single AZ
+Extremely high durability (11 9s) in single AZ, but data will be loss if AZ is destroyed 
+Low availability 99.5%
+Use case - secondary backup storing data you can recreate
+
+S3 Intelligent Tiering (new!)
+Small monthly monitoring + auto-tiering fee
+Automatically moves objects between 2 access tiers based on changing access patterns
+Extremely high durability (11 9s)
+Availability 99.9%
+
+S3 Glacier
+Low cost object storage
+Archiving/backup
+Data retained for long term (10+ years)
+Alt to on-prem magnetic tap storage
+Extremely high durability (11 9s)
+Cost per storage per month is very low
+Each item in Glacier = Archive = up to 40 TB
+Stored in Vaults (equivalent of bucket)
+3 retreival options - fast = expensive, slow = cheaper
+
+
+#####
+S3 Lifecycle Rules
+#####
+Set of rules to move data between tiers to save storage costs 
+Transition actions - defines when objects are transitioned to another storage class
+Expiration actions - delete objects after a certain period of time
+Move to glacier for helpful for backup
+
+####
+S3 versioning
+####
+Enabled at bucket level
+Any time you overwrite a file you get a new version ID
+The cost of versioning = the cost of the additional S3 stored or requested
+
+Best practice to version your buckets
+You can protect against unintended deletes (ability to restore a previous version)
+Easy roll back to previous version
+Any file that is not versioned prior to enabling versioning will have version "null"
+You can suspend versioning
+
+Ex: If you have a big data job that overwrites a file, and the job failed, you can always revert back to the previous correct version
+
+####
+S3 costs
+####
+no charge for data transferred within a region via COPY request
+there is a charge for data transferred via COPY between reegions
+
+no charge for data transferred between EC2 + S3 within same region
+there is a cost between regions
+
+after free tier, there is a cost for PUT and GET but not DELETE requests
+
+Normal S3 pricing applies when your storage is accessed by another AWS account
+Best to keep the dev and prod accounts in the same region to avoid unnecessary transfer costs
+You can configure buckets as a Requester Pays bucket = requester account will be charged the cost of requests + downloads 
+
+
