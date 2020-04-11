@@ -103,4 +103,89 @@ Normal S3 pricing applies when your storage is accessed by another AWS account
 Best to keep the dev and prod accounts in the same region to avoid unnecessary transfer costs
 You can configure buckets as a Requester Pays bucket = requester account will be charged the cost of requests + downloads 
 
+####
+S3 cross-region replication
+####
+asynchronous replication between 2 buckets in sepregions
+must enable versioning in source + dest bucket
+must give proper IAM perms
+can be in different accounts
+applies to new objects
+use case - compliance -  comply with stringent regulatory requirements for the storage of sensitive financial and personal data 
+- big data analysis - if analysis is done by team in a distant country where the original bucket is
+
+####
+S3 ETag (Entity Tag)
+####
+how do you verify if a file has already been uploaded to S3?
+names work, but how are you sure that the content of the file is exactly the same?
+
+#####
+S3 performance
+#####
+historically
+greater than 100 TPS (transactions per second) > S3 performance degregation
+suggested to add a random prefix to the file name to improve S3 partition distribution and therefore improve performance
+
+now should only be required for extreme cases 
+S3 can now support
+write = 3,500 requests per second
+read = 5,500 requests per second
+https://aws.amazon.com/about-aws/whats-new/2018/07/amazon-s3-announces-increased-request-rate-performance/
+
+increase PUT performance with multipart upload
+must use for objects > 5GB
+suggested to use for files > 100 MB
+allows PUTS to be parallelized = greater throughput
+max network bandwidth
+if one upload of a part fails > decrease time to try to retry
+
+increase GET performance with CloudFront
+cache S3 objects around the world
+
+S3 Transfer Acceleration
+PUT file to node close to client and AWS will transfer file on their internal network to deliver to the destination S3 bucket 
+
+If using SS3-KMS encryption for S3, you may have limited S3 GET capability because KMS is limited to ~100 - 1000 TPS (transactions per sec)
+
+####
+S3 Encryption for Objects
+####
+*important exam topic
+4 methods
+
+1. SSE-S3
+SSE-S3 encrypts S3 objects using keys handled + managed by AWS S3
+object encrypted server side
+AES-256 encryption type
+must set header as "x-amz-server-side-encryption":"AES256" when PUT object
+then AWS will then create S3 managed data key and will be put in the bucket
+
+2. SSE-KMS
+SSE-KMS leverage AWS KMS (Key Management Service) to manage encryption keys
+advantages of KMS - more control over rotation of the key + audit logs
+must set header as "x-amz-server-side-encryption":"aws:kms" when PUT object
+KMS Customer Master Key (CMK) created + now managed by KMS
+
+SSE-C manage own encryption keys
+fully managed by user outside of AWS - no keys stored within AWS
+HTTPS must be used + provide data key in the header
+AWS throws away the key right away
+
+client side encryption - client handles encryption
+need to use AWS Encryption Client
+clients must encrypt data themselves before sending to S3
+clients must decrypt data when retrieving data from S3
+
+Encryption in transit (SSL)
+S3 exposes
+HTTP endpoint = non encrypted
+HTTPS endpoint = encryption in flight = suggested
+encryption in flight is also known as SSL/TLS
+
+you can set default encryption for the bucket in the console
+
+######
+S3 CORS (Cross-Origin Resource Sharing)
+######
 
