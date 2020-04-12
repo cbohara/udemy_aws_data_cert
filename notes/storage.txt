@@ -273,3 +273,179 @@ Memcached service
 in-memory object store (like S3)
 cache doesn't survive reboots
 use cases- quick retreival of objects from memory
+
+####
+DynamoDB
+####
+fully managed, highly available with replication across 3AZ
+NoSQL database - not a relational db
+scales to massive workloads, distributed DB
+can handle millions of requests per sec
+contain trillions of rows, TBs of storage
+fast + consistent performance = low latency on retrieval
+enable event driven programming with DynamoDB streams
+low cost + autoscaling capabilities
+
+DynamoDB is made of tables
+each table has primary key - must be decided at creation time
+
+each table can have an infinite number of items (similar to row)
+each item has attributes - can be added over time, can be null
+max size is 400KB
+
+data types supported are 
+- scalar - string, number, binary, boolean, null
+- document - list, map
+- set - string set, number set, binary set
+
+primary keys
+option 1 - partition key only (hash)
+partition key must be unique for each time
+must be diverse so data is distributed
+ex: user_id = partition key for users table
+
+option 2 - partition key + sort key
+combo must be unique
+data is grouped by partition key
+sort key (aka range key) is used to sort items within the partition
+ex: user-games table
+user_id = partition key
+game_id = sort key
+
+when to use - need to ingest data at scale with quick reads
+use cases:
+mobile apps
+gaming 
+ad serving
+live events
+sensor networks
+metadata storage for web-based content
+web session management
+
+when not to use 
+- need to perform joins or complex transactions
+- storing binary large object (BLOB) - due to DynamoDB 400KB max size best to store data in S3 + metadata in Dynamo
+
+####
+Provisioned throughput
+####
+provision read + write capacity units
+Read Capacity Unit (RCU) = throughput for reads
+Write Capacity Units (WCU) = throughput for writes
+can setup auto-scaling in addition to base RCU + WCU
+or don't provision anything with on-demand option but very expensive
+
+throughput can be exceeded temporarily using burst credit
+if you kill credits > ProvisionedThroughputException
+it's advised to do expoential backoff retry
+
+# writes
+1 WCU = 1 write / 1 second for 1 item to 1 KB in size
+if an item is larger than 1 KB, more WCU are consumed
+ex 1: 10 object / second of 2KB each = need 2 * 10 = 20WCU
+ex 2: write 6 objects / second of 4.5 KB each
+need to round up the KB to 5 KB each
+6 objects * 5 KB = 30 WCU
+
+# reads
+strongly vs eventually consistent reads
+eventual = possible to get unexpected response bc of replication
+strong = read just after write > get correct data
+dynamo defaults to eventually consistent reads
+can set ConsistentRead to True for GetItem, Query, and Scan calls
+
+1 RCU = 1 strongly consistent read / second for an item up to 4KB
+1 RCU = 2 eventually consistent reads / second for an item up to 4KB
+if item is larger than 4 KB, need more RCU so you need to round up to the next 4KB
+ex 1: 10 strongly consistent reads per second of 4 KB each = 10 RCU
+ex 2: 16 eventually consistent reads per second for 12 KB each
+(16 reads / 2 eventually per second) * (12 KB / 4 KB per second) = 24 RCU
+ex 3: 10 strongly consistent reads per second of 6 KB each
+(10 / 1 strongly consistent read per sec) * (8KB / 4 KB per sec) = 20 RCU 
+
+# throttling
+if we exceed RCU or WCU, we get ProvisionedThroughputExceededException
+reasons
+- hot keys/partitions
+(ex: many reads on popular item)
+- very large items 
+solution
+exponential backoff when exception is encountered (already built in the SDK)
+distribute partition keys as much as possible
+if still RCU issue - use DAX for caching
+
+#####
+How DynamoDB partitions work
+#####
+you start with 1 parition
+each partition can contain up to 
+- 3000 RCU
+- 1000 WCU
+- 10 GB
+
+the RCU and the WCU will be spread evenly amongst all the partitions in the table
+ex: table settings 
+3 partitions
+total 6000 RCU
+total 2400 WCU
+each partition gets 2000 RCU + 2400 WCU
+
+how to compute # of partitions
+capacity = (total RCU / 3000) + (total WCU / 1000) 
+size = total GB / 10 GB
+CEILING = smallest integer value that is greater than or equal to a number
+total partitions = CEILING(MAX(Capacity, Size))
+total partitions = CEILING(MAX((total RCU / 3000) + (total WCU / 1000), (total GB/ 10 GB)))
+
+####
+DynamoDB API
+####
+# write data
+PutItem - write data to DynamoDB
+create data or full replace
+consumes WCU
+
+UpdateItem - update data in DynamoDB
+partial update of attributes
+
+ConditionalWrites
+accept write/update only if conditions are respected, otherwise reject
+helps with concurrent access to items
+no performance impact
+
+# delete data
+DeleteItem - delete individual row
+able to perform a conditional delete
+
+DeleteTable - delete whole table + all its items
+much quicker deletion than calling DeleteItem on all items
+
+# batch writes
+BatchWriteItem
+reduce latency by reducing API calls
+operations are done in parallel for better efficiency
+however it is possible for part of the batch to fail > DynamoDB notes which failed + we need to retry using exponential backoff algorithm
+
+up to 25 PutItem or DeleteItem in 1 call
+up to 16 MB per data written
+up to 400 KB per data per item
+
+# reads
+GetItem
+read based on primary key 
+primary key = HASH or HASH-RANGE
+eventually consistent read by default
+strongly consistent reads = 2x RCU 
+ProjectionExpression can be specified to include only certain attributes
+
+BatchGetItem
+allows you to retreive up to 100 items or up to 16 MB of data 
+each item is retreived in parallel
+
+Query
+returns items based on
+Partition Key (must be = operator)
+SortKey Value (=, <, <=, >=, Between, Begin) - optional
+FilterExpression for further client-side filtering
+returns up to 1 MB of data or # of items specified in limit
+able to do pagination on the results
