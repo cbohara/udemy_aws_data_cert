@@ -436,16 +436,110 @@ read based on primary key
 primary key = HASH or HASH-RANGE
 eventually consistent read by default
 strongly consistent reads = 2x RCU 
-ProjectionExpression can be specified to include only certain attributes
+ProjectionExpression can be specified to include only certain attributes like SELECT in SQL
 
 BatchGetItem
 allows you to retreive up to 100 items or up to 16 MB of data 
 each item is retreived in parallel
 
 Query
-returns items based on
+returns items based only on keys
 Partition Key (must be = operator)
 SortKey Value (=, <, <=, >=, Between, Begin) - optional
-FilterExpression for further client-side filtering
+FilterExpression like WHERE in SQL for further client-side filtering
+It is applied after a Query finishes (so it doesn't reduce RCU used), but before the results are returned
 returns up to 1 MB of data or # of items specified in limit
 able to do pagination on the results
+
+Scan
+scan the entire table + then filter out data
+inefficient unless you actually need all the data in the table
+returns up to 1MB of data - use pagination to keep on reading
+consume a lot of RCU
+limit impact on RCU using Limit or reducing the size of the result
+for faster performance, use parallel scans
+- multiple instances scan multiple partitions at the same time
+- increase throughput + RCU consumed
+can use ProjectionExpression + FilterExpression
+
+####
+DynamoDB Indexes
+####
+allow you to do different types of queries on table beyond partition keys
+
+# Local Secondary Index (LSI)
+alternate sort key for a given partition key value
+up to 5 LSI per table
+sort key = 1 scalar attribute (string, number, or binary)
+must be defined at table creation time
+
+# Global Secondary Index (GSI)
+speed up DynamoDB queries on non-key attributes
+create a new subtable with a GSI = partition key + optional sort key
+project the attributes you want in this subtable
+partition key + sort key from the original table will always be projected (KEYS_ONLY)
+you can also specify extra attributes to project (INCLUDE)
+or you can simply keep all attributes from the main table (ALL)
+must define RCU / WCU for the subtable
+possible to add + modify GSI after table creation
+
+###
+DynamoDB DAX
+###
+seamless cache for DynamoDB requiring no application rewrites
+writes go through DAX to DynamoDB
+microsecond latency for cached reads + queries
+solves hot key problem (too many reads) > reduce RCU 
+5 min TTL for cache by default
+can have up to 10 nodes in the cluster
+multi AZ (recommended to have at least 3 nodes in production)
+secure (encryption at rest, KMS, VPC, IAM, CloudTrail)
+
+apps communicate directly with DAX + DAX interacts with the DynamoDB table
+benefit = DAX will cache what we need right away
+
+doesn't autoscale - need to provision in advance
+
+###
+DynamoDB streams
+###
+react to changes to our DynamoDB table in realtime
+CRUD operations > DynamoDB stream > Lambda
+ex: react to new user registration > welcome email
+hard limit of 24 hours of data retention
+configurable batch size that lambda receivese = up to 1000 rows or 6MB of data
+
+DynamoDB streams kinesis adapter
+use the KCL library to directly consume DynamoDB streams
+DynamoDB stream > kinesis adapter library
+
+To read from DynamoDB streams you can either use Lambda or KCL library with the Kinesis adapter
+
+###
+DynamoDB TTL
+###
+automatically delete an item after expiration date/time
+provided at no extra cost + does not use WCU/RCU
+background task operated by DynamoDB service itself
+helps reduce storage + manage table size over time
+can also be used to adhere to regulatory norms - like we only store user data for X days
+enable TTL per item - by adding a TTL column + adding expiration date as value expire_on field
+DynamoDB typically deletes expired items with 48 hours of expiration
+deleted items also deleted in GSI/LSI
+if you accidentially delete items you can recover them from the DynamoDB streams (available for 24 hours)
+
+#####
+DynamoDB additional topicsq
+#####
+Security
+	VPC endpoints available to access DynamoDB without the internet
+	Access controlled by IAM
+	Encryption at rest using KMS
+	Encryption at transit using SSL/TLS
+Backup + restore feature available
+	Point in time restore like RDS
+	No performance impact
+Global tablese
+	Multi-region fully replicated, high performancee
+Can use Database Migration Service (DMS) to migrate to DynamoDB
+Can launch local DynamoDB on your computer for dev purposes
