@@ -186,6 +186,90 @@ encryption in flight is also known as SSL/TLS
 you can set default encryption for the bucket in the console
 
 ######
-S3 CORS (Cross-Origin Resource Sharing)
+S3 security
 ######
+S3 CORS (Cross-Origin Resource Sharing)
+limit which websites can access files in your S3 buckets as specified in CORS config
+This website is working when we go online, but when you run the website offline on your local host it doesn't work. Why? CORS
 
+S3 Access Logs 
+for audit purpose you may want to log all requests
+will log in another S3 bucket + can query via Athena
+
+User based
+IAM policies - which API calls should be allowed for specific user from IAM console
+
+Resource based
+Bucket policies = bucket wide rules from S3 console - like allow cross account access
+JSON based
+resources = buckets + objeects
+actions = allow or deny
+principal = account/user to apply policy to
+use case - grant public access to the bucket, force objects to be encrypted at upload, grant access from another account
+
+Object Access Control List (ACL) finer grain
+Bucket Access Control List (ACL) less common
+
+What is the best way to ensure all objects in the bucket are encrypted?
+old way = enable default encryption via bucket policy + refuse any HTTP command without proper headers
+new way = use default encryption in S3
+bucket policy trumps default encryption 
+
+Other S3 security details
+networking - supports VPC endpoints
+logging + audit = S3 access logs or AWS CloudTrail
+user security = MFA can be required for versioned buckets to delete objects
+You can make an S3 object available to a user for a limited time period using signed URLs
+
+#####
+Glacier + Vault Policies
+#####
+low cost object storage for archiving + backup
+alt to on-prem magnetic tape storage
+
+each item in glacier = archive 
+archives are stored in vaults
+
+Use glacier any time you want to archive from S3 after X days 
+
+each vault has 1 vault access policy + 1 vault lock policy
+access policy = very similar to bucket policy - used for restricting user/account perms
+
+lock policy = chose to lock the archive for regulatory or compliance requirements 
+the policy is immutable aka can never be changed
+ex: forbid deleting archive if less than 1 year old
+ex: implement WORM (write once read many) policy - guarantee that the file cannot be overwritten later
+
+###
+S3 Select + Glacier Select
+###
+retrieve less data using SQL by performing server sidee filtering in advance
+can filter by rows + columns (simple SQL statements)
+result in less network transfer + less CPU cost client-side
+
+S3 select can be used with Hadoop
+transfer filtered data set from S3 before analyzing it with your EMR cluster
+
+###
+ElastiCache 
+###
+RDS = managed Redis or Memcached service
+AWS takes care of all OS maintenance
+caches are in-memory databases with really high performance + low latency
+helps reduce load off of databases for read intensive workloads
+helps make application stateless
+write scaling using shards
+read scaling using read replicas
+multi AZ with failover capability
+
+Redis overview
+in memory key-value store
+super low latency (sub ms)
+cache survives reboot by default = persistence
+more popular
+use case - user sessions, leaderboard, distributed states, relieve pressure off databases, pub/sub capability for messaging
+
+Memcached service
+in-memory object store (like S3)
+cache doesn't survive reboots
+use cases- quick retreival of objects from memory
