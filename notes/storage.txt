@@ -543,3 +543,12 @@ Global tablese
 	Multi-region fully replicated, high performancee
 Can use Database Migration Service (DMS) to migrate to DynamoDB
 Can launch local DynamoDB on your computer for dev purposes
+
+####
+DynamoDB storing large objects
+####
+store object in S3 + add row to DynamoDB with metadata
+even for items that are under 400KB this is a good solution for items that are going to be read very little
+
+
+
