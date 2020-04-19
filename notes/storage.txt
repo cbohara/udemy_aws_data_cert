@@ -483,6 +483,17 @@ or you can simply keep all attributes from the main table (ALL)
 must define RCU / WCU for the subtable
 possible to add + modify GSI after table creation
 
+https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/SecondaryIndexes.html
+global secondary index
+allows you to set a totally different primary key + optional sort key than what is in the base table
+global bc queries on the index can span all data in the base table across all partitions
+stored in its own partition - own RCU + WCU 
+
+local secondary index
+uses the same partition key as the base table, but uses a different sort key
+used when you need to query by something different than the original partition + sort key
+local bc only looking at items in a the same partition bc still using the same partition key
+
 ###
 DynamoDB DAX
 ###
