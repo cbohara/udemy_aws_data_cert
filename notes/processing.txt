@@ -1,0 +1,5 @@
+######
+Lambda
+######
+in the world of big data - used to process data as it is moved around from one service to another
+
