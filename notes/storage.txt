@@ -560,6 +560,3 @@ DynamoDB storing large objects
 ####
 store object in S3 + add row to DynamoDB with metadata
 even for items that are under 400KB this is a good solution for items that are going to be read very little
-
-
-

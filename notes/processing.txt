@@ -24,3 +24,90 @@ aka lambda processes shard data synchronously
 Lambda Example
 #####
 need to base64 decode incoming kinesis data records
+
+#####
+Glue
+#####
+
+#######
+Glue crawler + catalog
+#######
+s3 partitions
+make sure your data is structured by how you want to query the data
+
+glue crawler 
+discovery + publish S3 schema so it can be used for analysis tools (Athena, Redshift, EMR) 
+also registers partitions
+
+glue crawler publishes schema in glue catalog
+
+glue catalog
+serves as a central metadata repository for data lake in S3
+stores where the data exists in s3, what the schema of the data is, how it is partitioned, etc
+can provide metadata to Hive on EMR
+
+when you create tables and databases manually, Athena uses HiveQL data definition language (DDL) statements 
+such as CREATE TABLE, CREATE DATABASE, and DROP TABLE
+under the hood to create tables and databases in the AWS Glue Data Catalog
+
+#######
+Glue ETL jobs 
+#######
+build custom ETL serverless Spark jobs > transform, clean, and enrich data before doing analysis
+can also automatically generate code in Python (or Scala) to perform ETL 
+encryption features - SSE at rest, SSL in transit
+can be event-driven via triggers, not just on a schedule
+can provision additional DPUs (data processing units) if underperforming
+errors reported to cloudwatch
+format conversions - CSV, JSON, Avro, Parquet 
+
+built in transformations
+DropFields, DropNullFields - perform cleanup by dropping null fields
+Filter - specify a function to filter records 
+Join - enrich data from another table
+Map - add/delete fields beyond a join
+
+ML transformations
+FindMatches ML
+used to ID duplicate or matching records in the data set
+even when the records do not have a common unique identifier and no fields match exactly
+
+can also use built-in Spark transformations
+including K-Means machine learning library
+
+development endpoints
+can develop ETL in a notebook
+then create a glue job to run the script
+
+endpoint is in a VPC controlled by security groups 
+can use elastic IPs to access a private endpoint address
+connect via Zeppelin running on local machine
+Zeppelin notebook server running on EC2
+can use Sagemaker notebooks
+can open terminal window (my method)
+PyCharm
+
+running glue jobs
+scheduler - like cron
+job bookmarks - allows you to pick up where you left off in the last job run
+persists the state of the job run
+avoids processing old data
+works best with keeping track of where you left off in S3
+can integrate with Cloudwatch events so after Glue job completed > trigger SNS/Lambda
+can invoke EC2 run, send event to kinesis stream, or activate step function in AWS Data Pipeline
+
+#######
+Glue cost + antipatterns
+#######
+billed by the minute for crawler + ETL jobs 
+first million objects stored are free
+development endpoint is charged per minute
+
+anti-patterns
+- should not be used for real-time processing
+supposed to be used for batch processing
+
+- shouldn't be used with DynamoDB because it is for fast lookups + requires no schema
+Glue is all about defining schema over S3
+
+- better off using EMR or AWS Data Pipeline if working with other engines already
