@@ -2,4 +2,25 @@
 Lambda
 ######
 in the world of big data - used to process data as it is moved around from one service to another
+lambda can be triggered by time like cron
+if your code does fail for some reason lambda will automatically retry 3 times? asked more details
+lambda must be in the same account as the service triggering it, in addition to having an IAM policy granting it access
 
+######
+Kinesis > Lambda
+######
+kinesis is not pushing data to lambda
+lambda polls for data from kinesis stream periodically in batches 
+max batch size is 10,000 records
+too large of a batch size can cause timeouts (max timeout is 15 minutes)
+max batch size is 6MB
+
+if lambda fails it will retry until it succeeds or the data expires
+this can stall the shards if you don't handle errors properly
+this is because the kinesis stream is just waiting for the lambda to complete before proceeding 
+aka lambda processes shard data synchronously 
+
+#####
+Lambda Example
+#####
+need to base64 decode incoming kinesis data records
