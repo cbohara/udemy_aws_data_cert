@@ -2,9 +2,10 @@
 Lambda
 ######
 in the world of big data - used to process data as it is moved around from one service to another
-lambda can be triggered by time like cron
-if your code does fail for some reason lambda will automatically retry 3 times? asked more details
+lambda can be triggered by time like cron but primarily event driven
 lambda must be in the same account as the service triggering it, in addition to having an IAM policy granting it access
+if your code does fail for some reason lambda will automatically retry 3 times
+https://aws.amazon.com/about-aws/whats-new/2019/11/aws-lambda-supports-max-retry-attempts-event-age-asynchronous-invocations/
 
 ######
 Kinesis > Lambda
