@@ -112,3 +112,121 @@ supposed to be used for batch processing
 Glue is all about defining schema over S3
 
 - better off using EMR or AWS Data Pipeline if working with other engines already
+
+######
+EMR
+######
+managed Hadoop framework on EC2 instances
+
+Hadoop
+- HDFS
+- YARN
+- MapReduce
+
+Architecture
+1 master/leader node
+manage cluster 
+runs all software compontents required to coordinate distribution of data + distribution of tasks
+
+core nodes
+run tasks that analyze data
+store data in HDFS
+
+task nodes
+only run tasks 
+do not store data
+good use of spot instances
+scale up + down as needed
+
+Transient vs Long-running clusters
+transient cluster = only use capacity you need
+perform a bunch of steps 
+store results 
+shutdown cluster
+
+long-running cluster
+use cluster to store data as a data warehouse
+enable termination + autotermination protection
+
+EMR/AWS integration
+let Amazon manage hosts on EC2
+can run cluster in VPC for security purposes
+can use S3 to store input + output data
+integrate with CloudWatch to monitor performance
+can use with CloudTrail to audit requests
+integrate with AWS Data Pipeline - can spin up + shut down transient EMR cluster as part of the pipeline
+
+######
+EMR Storage
+######
+HDFS
+stores data across different instances in the cluster
+try to analyze data on the instance where the data is stored
+stores multiple copies of data on different instances
+if you have a large file stored in HDFS, that file is going to be broken into blocks + those blocks are going to be stored in multiple places for backup purposes
+default block size is 128MB = ideal size to break your files into for sstorage in HDFS 
+HDFS is ephemeral = when you terminate the cluster the data is gone
+
+EMRFS = file system that looks like HDFS but is backed by S3
+
+EMRFS consistent view
+if you have a bunch of different nodes trying to write or read from S3 at the same time > consistency problem
+behind the hood uses DynamoDB database to store S3 metadata
+
+local file system is also available for storage
+useful for storing temporary data like buffers + caches
+
+EBS for HDFS 
+AWS automatically attach general purpose SSD 10 GB volume as root device
+used to enhace performance as root volume
+you can only attach EBS volumes when launching a cluster, not if the cluster is already running
+you cannot remove an EBS volume after launching
+
+#####
+EMR promises
+#####
+EMR charges by the hour + EC2 charges 
+EMR will provision new nodes if core nodes failYou can add and remove task nodes on the fly
+You can resize running cluster's core nodes
+
+#####
+Apache Spark
+#####
+uses in-memory caching
+uses DAGs to optimize query execution
+are not meant for OLTP or batch processing
+meant for analytical applications or doing larger tasks on a regular schedule
+
+Spark context object = driver program/script
+actual code
+will use YARN as cluster manager in EMR to determine how to distribute the work and aquires executor nodes to perform the work
+executor nodes = processes that run computations and store the data for the application
+the application code is sent to each executor
+spark context sends the tasks for the executor to run
+
+Spark core = foundation of the platform
+
+Spark SQL contains dataset construct
+makes it easy to import data as if it is a giant database
+allows you to run SQL queries against thee dataset
+
+Spark streaming for streaming analytics
+ingests data in mini batches 
+can use the same application code you would use for conventional Spark batch analytics
+so it improves developer productivity
+
+Other spark libs:
+MLLib 
+GraphX
+
+Spark Structured Streaming
+use dataset = like database table
+can imagine spark streaming = database table that keeps growing forever
+can query data over windows of time
+
+Spark Streaming + Kinesis
+can import data into Spark Streaming from Kinesis Data Stream
+
+Spark +  Redshift
+spark-redshift package makes it easy to query Redshift from spark job
+useful for ETL using Spark
