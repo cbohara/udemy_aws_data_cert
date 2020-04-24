@@ -230,3 +230,42 @@ can import data into Spark Streaming from Kinesis Data Stream
 Spark +  Redshift
 spark-redshift package makes it easy to query Redshift from spark job
 useful for ETL using Spark
+
+########
+AWS Data Pipeline
+########
+web service for reliably processing + moving data between diff AWS compute + storage services
+task scheduling framework  where you can run different operations that depend on each other at different schedules
+
+ex: log files from EC2 > S3 > analyze via EMR
+can orchestrate with data pipeline
+
+destinations - S3, RDS, DynamoDB, Redshift + EMR
+manages task dependencies
+will auto retry (default 3 up to 10) + notify via on failure alarm
+pipelines can work across regions
+can add pre-condition checks - either built in or execute custom script via bash command
+data sources may be on prem
+
+activities = action - EMR, Hive, Copy, SQL, scripts
+
+########
+AWS Step Functions
+########
+used to design workflows
+easy visualization
+advanced error handling + retry mechanism outside the code
+can maintain audit history of workflows
+wait between steps
+max execution time of a state machine is  1 year = can handle long lived processes/workflows
+defined using JSON based Amazon Steps Languagee (ASL) 
+
+can also be used to monitor a single job using  built in error handling + retry
+
+https://stackshare.io/stackups/aws-data-pipeline-vs-aws-step-functions
+AWS Data Pipeline can be classified as a tool in the "Data Transfer" category
+AWS Step Functions is grouped under "Cloud Task Management"
+
+https://stackoverflow.com/questions/55061621/aws-data-pipeline-vs-step-functions
+Data Pipeline specializes for import/output with AWS data storage resources
+Step Functions are good candidate tying together lambda jobs
