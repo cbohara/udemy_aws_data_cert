@@ -231,6 +231,98 @@ Spark +  Redshift
 spark-redshift package makes it easy to query Redshift from spark job
 useful for ETL using Spark
 
+######
+Apache Hive
+######
+write SQL like code over unstructured data 
+
+for EMR Hive sits on top of MapReduce + figures out how to distribute the processing of that SQL  on the underlying data in S3
+
+provides interactive web interface to enter SQL queries
+even though it is interactive it isn't fast
+good for high level SQL queries over large data sets
+
+Hive is trying to impart structure on unstructured data
+hive metastore stores info about what the diff columns of the raw data mean including column names+ data types
+
+It is possible to store your Hive Metastore within the Glue Data Catalog.  This is valuable because you can keep this metadata available even after the EMR cluster shuts down.
+
+By default the Hive metastore stores metadata in a MySQL database on the master node of your EMR cluster
+
+You can store the Hive metastore in an external RDS instance or Aurora rather than storing on the central node of an EMR cluster
+
+You can use Hive to read/write directly to/from S3 in EMR, allowing you to avoid writing to local temporary files
+
+DynamoDB integration
+process DynamoDB data using Hive
+define external Hive table based on DynamoDB table
+Hive allows you to copy data from DynamoDB into EMRFS or HDFS and vice versa
+
+######
+Apache Pig
+######
+Alt interface in MapReduce
+Pig Latin = scripting language - SQL style sequence that runs MapReduce jobs under the hood
+
+######
+HBase on EMR
+######
+non-relational unstructured database
+PB scale
+fast queries bc storing data in memory
+HBase integrates with Hive - use SQL over data stored in HBase = faster than querying over HDFS/EMR because in-memory 
+
+HBase sounds a lot like DynamoDB
+advantages of DynamoDB
+- fully managed serverless solution with autoscaling
+- don't have to manage EMR cluster
+- integration with other services
+advantages of HBase
+- better at storing sparse data - data spread all over the cluster
+- offers high write + update throughput = better performance vs DynamoDB
+
+can also export Hbase to S3 and vice versa
+
+######
+AWS Presto
+######
+can execute single SQL query over many different data stores at once (ex: joining tables in different systems)
+offers interactive queries at pedabyte scale
+similar to HBase, but even faster
+
+#####
+Zeppelin and EMR notebooks
+#####
+run scripts against data stored on EMR cluster interactively via web browser
+
+execute SQL queries via SparkSQL
+query results can be visualized in charts + graphs
+makes Spark feel more like a data science tool
+
+EMR notebook
+only available via AWS console
+similar to Zeppelin, but with more AWS integration
+automatically stored/backed up in S3
+allows you to run scripts to do work like spin up an EMR cluster, do a job, and tear the cluster down
+doesn't need to run on a running EMR cluster
+built in graphical libraries > graphs + charts
+multiple users can use the notebooks
+provided at no additional charge for EMR customers
+
+#####
+Assorted EMR tools
+#####
+Hue (Hadoop User Experience)
+front end console to manage the entire EMR cluster
+
+Splunk = operational tool used to visualize your EMR + S3 data in your cluster
+
+Flume
+moves streaming log data into EMR cluster
+
+MXNet
+library to perform deep learning on data stored over an EMR cluster
+
 ########
 AWS Data Pipeline
 ########
@@ -269,3 +361,4 @@ AWS Step Functions is grouped under "Cloud Task Management"
 https://stackoverflow.com/questions/55061621/aws-data-pipeline-vs-step-functions
 Data Pipeline specializes for import/output with AWS data storage resources
 Step Functions are good candidate tying together lambda jobs
+
