@@ -1,6 +1,8 @@
-1. Setup kinesis firehose
+####
+Initial setup
+####
+# Setup kinesis agent on an EC2 instance to send log files directly to kinesis firehose 
 
-Setup kinesis agent on an EC2 instance to send log files directly to kinesis firehose 
 https://docs.aws.amazon.com/streams/latest/dev/writing-with-agents.html
 Linux AMI
 sudo yum install –y aws-kinesis-agent
@@ -11,18 +13,38 @@ sudo chmod a+rw agent.json
 sudo vi agent.json
 python ./LogGenderator.py 100
 
+#####
 Order history app
+#####
 Want a mobile user to be able to access their order history
 Server logs > Kinesis data streams > Lambda > DynamoDB > mobile client
 
-2. Start kinesis stream CadabraOrders
+# Start kinesis stream CadabraOrders
 
-3. Create DynamoDB table
+# Create DynamoDB table
 CadabraOrders
 CustomerID = partition key = number
 OrderId = sort key = string
 
-4. Setup Kinesis consumer to add rows to DynamoDB
+# Setup Kinesis consumer to add rows to DynamoDB
 ssh into EC2
 install pip + setup AWS config
 run Consumer.py
+
+#####
+Product recommendations model
+#####
+Offer users product recommendations via Spark ML
+Server logs > Kinesis Firehose > S3 > EMR
+
+# EMR
+spin up cluster via console
+3 nodes - 1 master, 2 core
+specify Spark app
+
+SSH into master node
+cp /usr/lib/spark/examples/src/main/python/ml/als_example.py .
+spark-submit als_example.py
+
+update script using als-modifications.txt
+specify S3 path where log data stored in S3

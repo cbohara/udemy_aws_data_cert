@@ -323,6 +323,23 @@ moves streaming log data into EMR cluster
 MXNet
 library to perform deep learning on data stored over an EMR cluster
 
+S3DistCP
+tool used for copying massive amounts of data from S3 into HDFS + vice versa
+uses MapReduce under the hood
+
+ultimately you can install anything on EMR
+bc it's not serverless
+
+#####
+How to choose the right instance type
+#####
+master - general purpose M type
+core + task nodes can use general purpose M type nodes, but you may want to choose a more appropriate node for the job 
+
+ex: computationally intensive machine learning work would benefit from more CPUs
+ex: memory-caching applications like Spark - use high memory instance
+ex: both network + CPU intensive ML algorithms requiring data sets outside the cluster - choose cluster compute instance
+
 ########
 AWS Data Pipeline
 ########
