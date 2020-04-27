@@ -1,0 +1,181 @@
+######
+Machine Learning 101
+######
+predict unknown properties of an item, given its other properties
+examples:
+how much will this house sell for?  feed in historical sales data and share properties of the specific house to predict the sales price
+image classification
+is this biopsy result malignant? pattern matching based on historical patterns
+is this financial transaction fradulent?   
+
+supervised learning
+trained using historical data
+property you are trying to predict = label
+feed supervised machine learning system a training dataset 
+contains historical info with labels matched with known attributes
+
+ex: predict house sale price
+our training dataset has historical house prices associated with known attributes of every house
+like # of bedrooms, bathrooms, sq ft, etc
+these attributes are associated with the label = sales price
+
+model tries to find relationship between attributes + labels
+train the model based on historical info
+use that model to make predictions
+
+train/test = how do we evaluate model quality
+your training data is randomly split into training set + test set
+only the training set is used to train the model
+the model is then used on the test set
+we can then measure the accuracy of the predicted labels vs their actual labels
+
+Amazon ML is limited + outdated but shows up on the exam 
+only supports a handful of model types:
+regression
+classification - binary + multi class classification
+
+regression - trying to predict some numerical value based on past trends
+ex: housing price = specific # 
+
+binary classification
+ex: biopsy analysis
+is this malignant or not?
+only 2 options
+
+multi-class classification
+ex: image classification 
+is this a cat? or a dog? or a horse?
+many options 
+
+confusion matrix
+a way to visualize the accuracy of multiclass classification predictive models
+
+hyperparameters
+ML models depend on tuning the parameters of the model itself
+
+#####
+Amazon ML
+#####
+fully managed serverless service
+provides visualization tools + wizards to make creating a model easy
+point to training data in S3, Redshift, or RDS
+builds a model that can make predictions
+either performed in batches or can provide real-time results via low-latency API
+performs train/test for you 
+limited in what it can do 
+
+ideal usage patterns
+flag suspicious transactions = binary classification
+forecast product demand = regression 
+predict user activity = multi class classification
+classify social media > flag attention of social media team that needs to follow up
+
+cost model
+pay for what you use
+charged per compute time
+# of predictions 
+memory used to run your model
+compute hours for training
+
+promises and limitations
+promise no downtime = will always work
+most data you can feed is 100GB of training data
+up to 5 simultaneous jobs
+
+anti-patterns
+terabytes-scale data - better to use EMR with Spark
+unsupportive learning types - like deep learning
+
+######
+Sagemaker
+######
+create notebooks hosted on AWS
+fully managed serverless service
+train large scale models with serious computing horsepower
+on demand + scales better than ML
+
+write Python code in Jupiter notebook in order to use SageMaker
+avoid having to provision capacity for your ML jobs
+
+## includes 3 modules:
+1. build
+hosted environment within built in tools for ML and deep learning
+data exploration = exploring data, experimenting with algos, and visualizing output
+
+you can also work offline
+download a docker container to local env to develop modules
+test using the SageMaker Python SDK
+
+2. train 
+1 click model training at high scale + low cost
+Sagemaker search = quickly find + evaulate the quality of training runs
+offers auto hyperparameter tuning of jobs
+
+3. deploy
+fully managed environment to host + test models 
+also can deploy inference pipelines > pass raw input data > real-time and batch inference requests
+
+Sagemaker Neo
+train once and made available at edge nodes 
+low latency prediction response 
+
+## security
+code stored in ML storage volumes
+protected by security groups
+optionally encrypted at rest
+
+all artifacts are encrypted in transit and at rest
+API + console secured by SSL
+
+works with encrypted S3 buckets
+
+integrated with KMS, CloudWatch, Cloudtrail
+
+######
+Deep Learning 101
+######
+based on understanding of how our own brains work
+reverse engineer how our brain works + get a computer to do it
+
+individual nerve cells = neurons
+neurons are connected via axons
+individual neuron fires to neurons its connected to as soon as enough of its input signals are activated
+billions of neurons each with thousands of connections > human mind
+
+cortical columns
+process info in parallel
+ex: visual cortex
+different areas of what you see are processed by different columns of cortex neurons
+cortical column > mini column > hyper columns
+
+similar architecture of 3D video card on your computer
+its a bunch of very simple very small processing units = GPU = graphics processing unit
+GPU = specialized electronic circuit designed to rapidly manipulate and alter memory to accelerate the creation of images in a frame buffer intended for output to a display device
+highly parallel structure > more efficient vs general purpose CPU (central processing unit) for algorithms that process large blocks of data in parallel
+responsible to figure out how little groups of pixels on your screen are computed
+useful architecture for mimicking how your brain works
+
+deep learning = more than 1 layer of neurons
+think of it as another machine learning model
+you input feature data > define an activation function that will kick off when a threshold is hit > passes results to the next layer > so on and so forth until the output is the predicted labels (usually classification)
+trained using known labels
+
+neural nets built up of individual parallel processes per neuron
+GPU = parallelize the processing of lots and lots of neurons
+can have many GPUs on a single node in a cluster 
+and can have many nodes in the cluster 
+
+deep learning frameworks
+Tensorflow from Google
+MXNet from Apache
+
+type of neural networks
+feedforward neural network - simple neural network in which you input feature data and output predicted labels
+convolutional neural networks (CNN) - purpose built for processing image data for image classification
+recurrent neural network (RRN) - deal with sequences in time
+ex: predict stock prices, understanding words in a sentence
+LSTM - long short term memory can not only process single data points (such as an image) but also entire sequences of data (such as speach or video)
+GRU (gated recurrent units) are like LSTM but optimized for music and speach
+
+deep learning on EC2 / EMR
+EMR supports MXNet and use GPU instance types 
