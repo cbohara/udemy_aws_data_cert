@@ -41,4 +41,77 @@ https://docs.aws.amazon.com/kinesisanalytics/latest/dev/how-it-works-app-code.ht
 when you select rows, you insert results into another in-application stream
 use pumps to write to an in-application stream
 
+#####
+AWS Elasticsearch Service
+#####
+petabyte scale analysis and reporting
+horizontally scalable
+performant and cheap
 
+elasticsearch is a search engine
+built on top of open source version of Lucine
+part of the elastic stack
+
+includes Beats/LogStash - allows you to import data at scale into ElasticSearch cluster
+can use Kibana to visualize the data - like a Google Analytics dashboard
+
+use cases
+full-text search
+log analytics
+application monitoring
+security analytics
+clickstream analytics
+
+ElasticSearch concepts
+documents - things you are looking for
+can be more than text - any structured JSON data works
+every document has a unique ID
+
+types - define schema + mapping shared by documents that represent the same sort of thing
+going to be deprecated and replaced with indices
+
+indices - power search into all documents within a collection of types
+contain inverted indices that let you search across everything within them at one
+essentially a collection of documents that are related to some thing
+
+indices are split into shards
+each shard exists in a different node in a cluster
+each shard is its own mini search engine
+
+each index has 2 primary shards + 2 replicas
+write requests are routed to the primary shard, then replicated
+read requests are routed to the primary or any replica
+your application is responsiblef for round-robin the read requests amongst the nodes
+
+Amazon ElasticSearch service
+fully-managed but not serverless
+you need to chose the number of nodes like EMR
+pay for what you use - instance hours, storage, and data transfer
+network isolation using VPC
+security with encryption at rest + in transit
+control access via cognito and IAM
+
+integration with other AWS services
+itegrates well with IoT
+offers node awareness - can have 2 AZ in same region = increase availability but increase latency
+can use kinesis > lambda > elasticsearch
+can also receieve dynamoDB streams
+
+setup options
+how many dedicated master nodes do you want? 
+domains aka cluster
+snapshots to S3? good for automated backup storage
+zone awareness? increase availability but also increase latency 
+
+ES Security
+request signing required for all incoming traffic
+can setup cluster in the VPC but cannot change later
+
+if you setup ES cluster in a VPC, how do you access Kibana (which is a web interface)?
+easiest way to do so is to use Cognito for login > access Kibana
+if working on public you can update access policy to specify your IP address
+
+ES antipatterns
+shouldn't be used for OLTP (no transaction support)
+encouraged for search + analytics but not necessarily ad-hoc querying
+AWS encourages you to use AWS for that

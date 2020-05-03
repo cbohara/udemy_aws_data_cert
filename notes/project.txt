@@ -67,3 +67,8 @@ send anomoly events to another kinesis stream
 triggers lambda function > SNS text message
 
 Kinesis Data Analytics provisions capacity in the form of Kinesis Processing Units (KPU). A single KPU provides you with the memory (4 GB) and corresponding computing and networking. The default limit for KPUs for your application is eight.
+
+#####
+Near real-time log analysis
+#####
+server logs > kinesis firehose > elasticsearch service
