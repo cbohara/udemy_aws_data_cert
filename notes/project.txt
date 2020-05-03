@@ -48,3 +48,22 @@ spark-submit als_example.py
 
 update script using als-modifications.txt
 specify S3 path where log data stored in S3
+
+#####
+Predict order quantities
+#####
+schema 
+catagorial = represents different catagories
+includes invoice number because it's not a quantative number
+vs 
+quantity = the number has actual meaning + can be used for regression analysis
+
+######
+Transaction rate alarm
+######
+kinesis agent sends order logs > kinesis data stream
+analyze stream using kinesis data analytics
+send anomoly events to another kinesis stream
+triggers lambda function > SNS text message
+
+Kinesis Data Analytics provisions capacity in the form of Kinesis Processing Units (KPU). A single KPU provides you with the memory (4 GB) and corresponding computing and networking. The default limit for KPUs for your application is eight.

@@ -1,0 +1,44 @@
+#####
+Kinesis analytics
+#####
+not only accepts input from kinesis data stream
+also accepts input from kinesis firehose
+
+can also include reference source table to enrich your input data stream
+store reference data as an object in S3
+creates in-app table for lookups
+
+application code = SQL statements 
+operates over windows of time
+
+destination > kinesis data stream or firehose
+any errors that occur will be sent to kinesis error stream
+
+use cases for Kinesis Analytics
+1. realtime ETL
+2. continuous metric generation
+ex: calculate # of uniq website visitors every 5 minutes
+send results to Redshift for further analysis 
+3. responsive analytics 
+ex: monitor for events that mean certain criteria + then automatically notify the right customers > output to kinesis stream > notify via SNS
+
+cost
+use carefully bc it isn't cheap
+
+security
+enabled via iam permissions
+
+schema discovery 
+analyzes incoming data from your stream
+edit + correct as needed
+
+RANDOM_CUT_FOREST
+SQL function
+used for anomaly detection on numeric columns in a stream
+novel way to identify outliers in a data set
+
+https://docs.aws.amazon.com/kinesisanalytics/latest/dev/how-it-works-app-code.html
+when you select rows, you insert results into another in-application stream
+use pumps to write to an in-application stream
+
+

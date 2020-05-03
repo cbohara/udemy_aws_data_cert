@@ -31,8 +31,8 @@ we can then measure the accuracy of the predicted labels vs their actual labels
 
 Amazon ML is limited + outdated but shows up on the exam 
 only supports a handful of model types:
-regression
-classification - binary + multi class classification
+1. regression
+2. classification - binary + multi class classification
 
 regression - trying to predict some numerical value based on past trends
 ex: housing price = specific # 
