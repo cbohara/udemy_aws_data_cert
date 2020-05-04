@@ -72,3 +72,12 @@ Kinesis Data Analytics provisions capacity in the form of Kinesis Processing Uni
 Near real-time log analysis
 #####
 server logs > kinesis firehose > elasticsearch service
+
+######
+data warehousing and visualization
+######
+server logs > firehose > S3 
+S3 > glue > athena (serverless)
+S3 > redshift > quicksight (managed)
+
+

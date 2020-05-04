@@ -115,3 +115,32 @@ ES antipatterns
 shouldn't be used for OLTP (no transaction support)
 encouraged for search + analytics but not necessarily ad-hoc querying
 AWS encourages you to use AWS for that
+
+######
+Athena
+######
+ORC and Parquet are columnar and splittable
+Avro is splittable but more for row based storage
+
+use cases
+good for ad-hoc querying
+can checkout data before loading into Redshift data warehouse
+analyze logs 
+integration with Jupyter/Zeppelin
+integration with QuickSight or via ODBC/JDBC with other viz tools
+
+Athena + Glue
+Glue stores metadata about S3 dataset
+expose table definition to Athena
+
+Athena cost model
+$5/TB scanned for successful or cancelled queries
+not charged for failed queries
+no charge for DDL (create/alter/drop)
+better cost + performance with ORC and Parquet
+partitioning data reduces cost > scan less data
+
+security
+can encrypt Athena results using SSE-SE, SSE-KMS, or CSE-KMS
+transport layer security (TLS) encrypts in-transit between Athena and S3
+
