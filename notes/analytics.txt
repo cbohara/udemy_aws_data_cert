@@ -144,3 +144,134 @@ security
 can encrypt Athena results using SSE-SE, SSE-KMS, or CSE-KMS
 transport layer security (TLS) encrypts in-transit between Athena and S3
 
+#######
+Redshift
+#######
+fully managed petabyte scale data warehouse service
+fast using machine learning, massively parallel query execution, columnar storage, and high performance disks
+designed for OLAP not OLTP
+use ODBC and JDBC interfaces for SQL executions
+can scale up + down on demand
+use replication + continuous backups
+automatically recovery from node failures
+
+use cases
+accelerate analytics workloads
+unified data warehouse + data lake
+
+# Architecture
+leader node
+interface for external clients
+develops execution plan = ordered set of steps to process query
+coordinates parallel execution of plans with compute nodes
+aggregates intermediate results from the nodes
+returns the results back to the application
+
+compute nodes
+each cluster can have 1-128 nodes
+responsible for executing steps provided by leader node
+sends intermediate results back to leader node for aggregation
+has its own dedicated CPU, memory, attached disk storage
+
+2 diff compute nodes
+1. dense storage (DS)
+create a very large data warehouse using hard drive disks (HDDs) at a very low price point
+2. dense compute (DC)
+high performance using fast CPUs and solid state disks (SSD)
+
+every compute node is divided into slices
+# of slices per node is determined by node size of the cluster
+process chunks of the data given to it
+
+# Redshift Spectrum
+query exabytes of unstructured data in S3 without loading into Redshift cluster
+limitless concurrency
+horizontal scaling
+separate storage + compute resources
+spectrum is just taking care of the compute
+supports Gzip and snappy compression
+
+# Redshift performance
+Massive Parallel Processing (MPP)
+
+columnar data storage -
+efficient because all values of the same data type can be stored more efficiently vs row based storage in which each column has a different data type
+block size of 1 MB
+https://docs.aws.amazon.com/redshift/latest/dg/c_columnar_storage_disk_mem_mgmnt.html
+
+column compression -
+cannot change after column is created
+can analyze the logic used
+can have it taken care of automatically or explicitly define
+
+# Redshift durability
+data loaded into redshift is stored in 3 places
+1. original copy
+2. replica copy within the cluster - if your cluster has more than 1 compute node
+3. periodic backups into S3 - asychronously replicated in another region for disaster recovery
+
+in addition you can enable automated snapshots of the entire cluster
+defaults to 1 day retention period but can be up to 35 days 
+if cluster fails > create a new cluster and restore with snapshot
+
+note a redshift cluster is limited to a single AZ
+
+# Redshift scaling
+can perform vertical (increasing node instance type) + horizontal scaling (increasing the number of nodes) on demand
+how does this work?
+existing redshift cluster becomes read only
+new cluster created
+when new cluster is ready, the existing cluster will be temp unavailable while CNAME is flipped for the new cluster 
+then data will be moveed from the compute nodes in the existing data warehouse cluster in parallel to the compute nodes in the new cluster
+
+# Redshift distribution styles
+chosen upon table creation
+
+2 goals for data distribution 
+1. distribute the workload uniformly among the nodes
+2. minimize data movement during query execution
+
+AUTO
+automatically figured out by Redshift
+
+EVEN
+round robin
+not trying to cluster together info in any logical sort of way
+
+KEY
+distributed according to values in 1 column
+good when querying based on specific column in your data
+ex: user ID 
+
+ALL
+copy of the entire table is distributed on every node
+takes much longer to load the data
+only appropriate for slow moving tables that aren't updated frequently
+not good for small dimension tables
+
+# Redshift sort keys
+similar to indexes or indices in RDBS
+values in the column are stored on disk in sorted order
+enables efficient handling of range restricted predicates
+stores min + max values on block as part of its metadata
+allows you to skip over ranges of data when querying
+
+what's a good choice of sort key?
+if you are more likely to query more recent data frequently = use timestamp
+frequent range or equality filtering on a specific column = use that column
+frequently join table = use column you are joining on
+
+single sort key
+single value to sort the data
+good for querying by a single column
+
+compound sort key
+contains many columns 
+order matters 
+primary column = used most often
+default sort type
+improves compression
+
+interleaved sort key
+equal weight to each column
+useful if multiple queries use different columns for filters
