@@ -77,7 +77,16 @@ server logs > kinesis firehose > elasticsearch service
 data warehousing and visualization
 ######
 server logs > firehose > S3 
-S3 > glue > athena (serverless)
-S3 > redshift > quicksight (managed)
+S3 > glue > athena or redshift spectrum > quicksight
 
+create IAM role for Redshift to access Glue data catalog + S3
+add to cluster permissions
 
+using redshift spectrum 
+open editor in console
+create an external schema to connect our redshift cluster with S3 data that is registered in the Glue data catalog
+
+CREATE external schema database_name FROM data catalog
+database 'database_name_in_glue'
+iam_role 'iam_role_access_to_S3_and_Glue'
+region 'us-east-1'

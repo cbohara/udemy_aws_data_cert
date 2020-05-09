@@ -275,3 +275,155 @@ improves compression
 interleaved sort key
 equal weight to each column
 useful if multiple queries use different columns for filters
+
+# Import / Export
+COPY 
+parallelized, efficient import external data into Redshift cluster
+can specify prefix to copy all files under
+also provide specific manifest file
+authorize via IAM roles or AWS key + secrete key 
+can decrypt data that is encrypted in S3 while COPYing 
+
+if you need to load a "narrow" table (lots of rows, few columns) = use single COPY command
+
+INSERT INTO SELECT
+move data within Redshift
+
+CREATE TABLE AS
+refer to data that is already in Redshift in another table
+
+UNLOAD
+unload table into files into S3
+
+Enhanced VPC routing
+copy data within VPC rather than public internet
+
+# Cross-region replication for backup
+say you want to copy a snapshot into another region for backup purposes
+and the original Redshift cluster uses KMS-encryption
+
+in destination region
+create a KMS key if you don't have one
+setup name for snapshot copy grant
+associate KMS key with copy grant
+
+in source region
+enable copying of snapshots to the copy grant in the destination region
+
+DBLINK
+extension that allows you to connect Redshift cluster to PostgreSQL
+copy + sync data 
+allows you to take advantage of best of both worlds - columnar and row based storage
+
+Redshift integrates with 
+S3 - import + export 
+DynamoDB - import data
+EMR/EC2 - import via SSH 
+Data Pipeline - automate data movement in + out of redshift
+Database Migration Service - helps with import process from existing data warehouse
+
+# Redshift Workload Management (WLM)
+prioritize short, fast queries over long, slow queries 
+setup different query queues
+setup via console, CLI, or API
+
+# concurrency scaling
+automatically add cluster capacity to handle increase in concurrent read queries
+support virtually unlimited concurrent users + queries
+use WLM queues to managee which queries are sent to the concurrency scaling cluster
+prioritize queries that need to be done asap to take advantage of concurrency scaling while allow others to take their time with standard resources
+
+# automatic workload management options
+creates up to 8 queues (default 5)
+large queries = low concurrecy = more resources available per query
+small queries = high concurrency = less resources per query
+
+configuring queues by
+- priority - dedicated resources for specific higher prio queries 
+- concurrency scaling - enable more resources for bursts in read queries
+- user groups - segregate queries by users
+- query groups - segregate by automated processes
+- query monitoring rules
+ex: abort queries that take longer than 60 seconds if they are in the small query queue + move it to a longer query queue
+
+# manual workload management
+1 default queue that can handle 5 concurrent queries
+superuser queue with concurrency level of 1 = for admin queries from DBA
+define up to 8 queues with concurrency level up to 50
+
+# short query acceleration (SQA)
+prioritize short running queries over long running ones
+can be used in place of WLM
+can work with CREATE TABLE AS (CTAS) or read-only SELECT queries
+use machine learning algo to determine run time
+can configure how many seconds you consider "short"
+
+VACUUM command
+recovers space from deleted rows + restores sort order
+VACUUM FULL = default = 
+VACUUM DELETE ONLY = deletes only, no resortingg rows
+VACUUM SORT ONLY = sort only but not reclaim disk space
+VACUUM REINDEX = used for cleanup for tables using interleaved sort key option
+
+Redshift anti-patterns
+Small data sets - use RDS instead
+OLTP - use RDS or DynamoDB instead
+Unstructured data - ETL first + then load into Redshift
+BLOB data - better use S3 + store references to files in S3
+
+# Resizing redshift clusters
+Elastic resize
+quickly add/remove nodes of the same type
+cluster is only down for a few minutes
+tries to keep connections open during down time
+limited to doubling or halving for certain node types 
+
+Classic resize
+changing node types and/or number of nodes 
+cluster is read-only for hours to days
+
+Better alternative to classic resize
+snapshot to copy cluster
+resize new cluster
+shift traffic to new cluster from older cluster to new cluster
+
+new redshift features for 2020
+RA3 nodes with managed storage = scale compute + storage capacity independently
+Redshift data lake export  = unload Redshift queries to S3 in Apache Parquet format with auto partitioning
+
+Redshift spectrum vs athena
+https://stackoverflow.com/questions/50250114/athena-vs-redshift-spectrum
+Redshift spectrum is good if you already have a Redshift cluster up + running
+allows you to join data residing in Redshift with data residing in S3 without having to load the data in  
+
+#####
+RDS
+#####
+hosted relational database
+more relevant for small data
+
+ACID compliance
+Atomicity
+entire transaction as a whole has to be successful
+if any parts fails the transaction is invalidated
+Consistency
+must adhere to all defined rules (ex: constraints)
+Isolation 
+each transaction is independent 
+necessary for concurrency control
+Durable
+once transaction is successfully completed the data is guaranteed to be stored 
+
+Amazon Aurora
+compatible with MySQL and PostgreSQL
+up to 5x faster than MySQL and 3x faster than PostgreSQL
+stores up to 64TB per database instance
+Up to 15 read replicas
+continuous backup to S3
+replication across AZ
+automatic scaling with Aurora Serverless
+
+security
+VPC network isolation
+at rest encryption with KMS
+in transit encryption with SSL
