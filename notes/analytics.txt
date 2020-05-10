@@ -396,6 +396,30 @@ https://stackoverflow.com/questions/50250114/athena-vs-redshift-spectrum
 Redshift spectrum is good if you already have a Redshift cluster up + running
 allows you to join data residing in Redshift with data residing in S3 without having to load the data in  
 
+tips from AWS reinvent workshop
+5 points of guidance = SET DW
+S
+sort key
+improve filter performance
+choose up to 3 columns
+
+E
+encoding of columns
+compress all columns except for 1st sort key column
+
+T
+table maintainance
+auto vacuum
+
+D
+distribution key
+
+W
+warehouse management
+setup different queues = one for ETL, one for ad-hoc
+can setup query monitoring rules
+ex: stops user from running select *
+
 #####
 RDS
 #####
