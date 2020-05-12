@@ -90,3 +90,7 @@ CREATE external schema database_name FROM data catalog
 database 'database_name_in_glue'
 iam_role 'iam_role_access_to_S3_and_Glue'
 region 'us-east-1'
+
+quicksight
+can use auto option to have aws determine appropriate visualization tool given diff dimensions
+capture = snapshot of graph can be used for presentation + put into storyboard  
