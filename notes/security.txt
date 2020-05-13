@@ -45,5 +45,3 @@ we encrypt the plaintext message on the local machine
 send encrypted data > S3 for storage
 client computer then gets object from S3
 uses data key on client computer to decrypt data
-
-
