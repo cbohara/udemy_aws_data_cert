@@ -1,0 +1,49 @@
+######
+encryption 101
+######
+
+https://en.wikipedia.org/wiki/Key_(cryptography)
+for encryption algorithms, a key specifies the transformation of plaintext to ciphertext, and vice versa for decryption algorithm
+keys are essentially super random computer generated password
+
+## encryption in flight
+uses server sockets layer (SSL)/Transport Layer Security (TLS) encryption protocols
+
+data is encrypted before sending and decrypted after receiving
+only myself + the server can see the plain text
+"in flight" over the public internet the data is encrypted
+ensures no MITM (man in the middle attack) can happen
+
+ex: sending credit card info a server to make a payment
+want to make sure no one else on the way can see credit card #
+sending to HTTPS website = guarantees SSL enabled 
+
+https://www.cloudflare.com/learning/ssl/what-is-https/
+when a user connects to a website, the website sends over its SSL certificate which contains the public key
+client + server then go through SSL/TLS handshake = series of back + forth communications used to establish secure connection
+
+## server side encryption at rest
+after the server receives data, it is encrypted + stored on the server
+data will need to be decrypted before being sent back to client
+
+encryption/decryption keys are managed by AWS KMS
+the server must have access to KMS
+
+### example using SSL and SSE
+object > securely transmitted over internet using HTTPS > AWS EBS 
+EBS uses data key to encrypt data for storage
+EBS uses data key to decrypt data > transmit object over HTTPS > client
+
+## client side encryption
+data is encrypted by the client
+the server will never be able to decrypt that data
+the data will be decrypted by a receiving client
+
+### example using client side encryption
+on client computer we have a data key
+we encrypt the plaintext message on the local machine
+send encrypted data > S3 for storage
+client computer then gets object from S3
+uses data key on client computer to decrypt data
+
+
