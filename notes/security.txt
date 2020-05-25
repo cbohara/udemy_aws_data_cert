@@ -45,3 +45,45 @@ we encrypt the plaintext message on the local machine
 send encrypted data > S3 for storage
 client computer then gets object from S3
 uses data key on client computer to decrypt data
+
+####
+KMS (Key Management Service)
+####
+Anytime you need to share sensitive info use KMS
+Ex: DB password, creds to external service
+
+Never store secrets in plaintext file in your code!
+Can use KMS API to retrieve value in code
+Make sure IAM policy allows for API calls
+
+Encrypts up to 4KB of data
+If data > 4 KB use envelope encryption
+
+AWS manages encryption keys for us
+- Create key
+- Rotation policies
+- Disable key
+- Enable key
+
+Can audit key usage using CloudTrail
+
+How does KMS work?
+Encrypt + Decrypt API
+Client > KMS Encrypt API > make a request to KMS CMK > checks IAM to make sure user/role has permissions > if so then KMS returns the encrypted secret > client stores encrypted secret 
+Client > KMS Decrypt API > make a request  to KMS CMK > check IAM to make sure user/role has permissions > if so KMS returns the decrypted secret in plain text
+
+Encryption in AWS services
+S3 allows you to encrypt in place
+
+#####
+Cloud HSM
+#####
+KMS - AWS manages software for encryption
+CloudHSM - AWS provisions encryption hardware but client has to manage the software
+Client manages their own encryption keys
+Dedicated hardware = Hardware Security Module (HSM)
+Supposed to be "temper resistant"
+Cluster spread across multi AZ
+Supports symmetric + asymmetric encryption
+No free tier
+Must use CloudHMS client software
