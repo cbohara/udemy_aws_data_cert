@@ -1,10 +1,19 @@
 ######
-encryption 101
+Encryption 101
 ######
-
 https://en.wikipedia.org/wiki/Key_(cryptography)
-for encryption algorithms, a key specifies the transformation of plaintext to ciphertext, and vice versa for decryption algorithm
+In cryptography, a key is a piece of information (parameter) that determines the functional output of a cryptographic algorithm
+
+for encryption algorithms, a key specifies the transformation of plaintext to ciphertext
+for decryption algorithms, a key specifies the transformation from ciphertext to plaintext
 keys are essentially super random computer generated password
+
+symmetric key algorithm - use the same key for both encryption + decryption
+
+asymmetric key alorithm - use a public key and a private key
+ex: SSH with RSA keypair
+public key - used for encryption
+private key - used for decryption 
 
 ## encryption in flight
 uses server sockets layer (SSL)/Transport Layer Security (TLS) encryption protocols
@@ -47,6 +56,18 @@ client computer then gets object from S3
 uses data key on client computer to decrypt data
 
 ####
+VPC
+####
+Virtual Private Cloud
+provision a logically isolated section of the AWS cloud
+where you can launch AWS resources in a virtual network that you define
+
+example setup:
+public facing subnet for your web servers that have access to the internet
+place backend systems (DB, app servers) in a private facing subnet with no internet access
+can use multiple layers of security - security groups, network access control lists - to help control access to the EC2 instances in each subnet
+
+####
 KMS (Key Management Service)
 ####
 Anytime you need to share sensitive info use KMS
@@ -87,3 +108,87 @@ Cluster spread across multi AZ
 Supports symmetric + asymmetric encryption
 No free tier
 Must use CloudHMS client software
+
+######
+Kinesis
+######
+Data Streams:
+SSL endpoints using HTTPS protocol 
+KMS offers server side encryption
+client side encryption - will need to use your own encryption libraries
+supported interface for VPC endpoints/private link
+KCL - read from Kinesis - must grant read/write access to DynamoDB table to keep track of checkpointing
+
+Data Firehose:
+Attach IAM role to enable delivery to S3/ElasticSearch/Redshift/Splunk
+Encrypt delivery stream with KMS (SSE)
+supported interface for VPC endpoints/private link
+
+Data Analytics:
+Attach IAM role so it can read from Kinesis Data Streams + reference sources and write to output destination
+
+#####
+SQS
+#####
+Encryption in flight using HTTPS endpoint
+SSE using KMS
+SQS queue access policy - ensure user has access to SQS service - similar to S3 bucket policy
+Client side encryption must be implemented manually
+VPC endpoint 
+
+####
+AWS IoT
+####
+AWS IoT policy - attached to X.509 certificates or Cognito identies
+can revoke any device at any time
+can be attached to groups, not just individual things
+
+####
+S3
+####
+S3 bucket policy - manage access at the bucket level
+Access Control Lists (ACLs) - manage access at the object level 
+VPC endpoint provided through a Gateway endpoint
+Glacier - vault lock policies prevent deletes (WORM - write once read many)
+
+####
+DynamoDB
+####
+data encrypted in transit using TLS (HTTPS)
+data can be encrypted at rest 
+for new tables - use KMS encryption for base tables + secondary indexes
+for existing tables - need to migrate unencrypted table to a new table with KMS encryption enabled
+encryption cannot be disabled once enabled
+
+DynamoDB streams currently does not support encryption
+VPC endpoint
+
+####
+RDS
+####
+deployed within VPC = network isolation
+Security groups control network access to DB instances
+KMS encryption at rest
+SSL provides encryption in flight
+IAM policies provide protection to RDS API itself, not for protection from within the database
+IAM auth is supported by PostgreSQL and MySQL - allows you to connect without needing a password
+Must manage user perms within the database itself - traditional DBA work
+MSSQL and Oracle TDE (Transparent Data Encryption)
+
+####
+Aurora
+####
+Same security stuff as RDS
+Just a special serverless version of RDS supporting PostgreSQL + MySQL only
+
+###
+Lambda
+###
+Must have IAM role attached to it - defines permissions of what it can do
+Sources of data
+Targets of data
+KMS encryption for secrets
+SSM (Systems Manager) parameter store for configuration
+Encrypt secrets within SSM with KMS
+CloudWatch logs
+Deploy within VPC to access private resources
