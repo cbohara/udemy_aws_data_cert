@@ -192,3 +192,119 @@ SSM (Systems Manager) parameter store for configuration
 Encrypt secrets within SSM with KMS
 CloudWatch logs
 Deploy within VPC to access private resources
+
+####
+Glue
+####
+Configure Glue to only access JDBC through SSL
+
+Data Catalog
+- Encrypted by KMS = encrypted at rest
+- Resource policies to protect data catalog resources (similar to S3 bucket policy)
+
+connection passwords can be encrypted by KMS
+data written by AWS Glue - Security Configs
+- S3 encryption mode 
+- Cloudwatch encryption mode
+- Job bookmark encryption mode
+
+####
+EMR
+####
+
+## secure access
+suggested reading:
+https://aws.amazon.com/blogs/big-data/best-practices-for-securing-amazon-emr/
+
+use EC2 key pair to manage SSH access to instances
+
+attach IAM roles to EC2 instances for
+- proper S3 access
+- for EMRFS requests to S3
+- DynamoDB scans through Hive
+
+EC2 security groups allow for node-to-node communication
+- one for master node
+- another one for the cluster nodes - core or task node
+
+Kerberos auth - provide auth from Active Directory to cluster
+Apache Ranger - centralized authorization (RBAC - Role Based Access) - setup on external EC2 instance
+
+## encryption
+at rest data encryption for EMRFS 
+encryption in Amazon S3
+SSE-S3, SSE-KMS, Client side encryption
+SSE-C is not supported by EMRFS
+
+encryption in local disks
+- open source HDFS encryption
+- EC2 instance (physically attached to the cluster) store encryption
+  - NVMe encryption or LUKS encryption
+- EBS volumes (not physically attached, attached via network) 
+  - EBS encryption using KMS works with the root volume
+  - LUKS encryption does not work with the root volume 
+
+in transit encryption
+use TLS encryption for
+- node-to-node encryption 
+- for EMRFS traffic between S3 and the cluster nodes
+
+####
+ElasticSearch
+####
+deploy within VPC
+enable ElasticSearch policy
+encyption at rest using KMS
+encryption in transit using SSL 
+
+IAM or cognito based auth
+Amazon Congito allows end-users to log-in to Kibana via Microsoft Active Directory using SAML (SSO)
+
+####
+Redshift
+####
+VPC network isolation
+apply cluster security groups
+encryption in flight using JDBC driver enabled with SSL
+encryption at rest using KMS or HSM device 
+
+role or access/secret key must be specified in SQL COPY + UNLOAD commands
+
+https://docs.aws.amazon.com/redshift/latest/dg/c_loading-encrypted-files.html
+COPY supports
+SSE-S3
+SSE-KMS
+client-side encryption using client-side symmetric master key
+
+COPY does not support
+SSE-C
+client-side encryption with KMS managed customer master key
+client side encryption using customer provided asymmetric master key
+
+UNLOAD 
+default SSE-S3
+alt options - SSE-KMS or client-side encryption
+
+####
+Athena
+####
+IAM policies to control access
+underlying data is in S3 so that is protected using S3 services - IAM policies, bucket policies, and ACLs
+encryption of data according to S3 standards - SSE-S3, SSE-KMS, CSE-KMS
+encryption in transit using TLS between Athena + S3 and JDBC
+fine grain accessed using AWS Glue Catalog
+
+#####
+Quicksight
+#####
+Standard
+- IAM users
+- Email based accounts
+
+Enterprise
+- Active Directory
+- Federated Login
+- Supports MFA
+- Encryption at rest + in SPICE
+
+Row level secuirty to control which users can see which rows 
