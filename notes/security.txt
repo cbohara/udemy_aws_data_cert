@@ -308,3 +308,89 @@ Enterprise
 - Encryption at rest + in SPICE
 
 Row level secuirty to control which users can see which rows 
+
+#####
+STS - Security Token Service
+#####
+allows to grant limited + temp access to AWS resources
+valid up to 1 hour - must be refreshed
+used for
+- cross account access
+- federation - link Active Directory creds
+uses SAML (security assertion markup language)
+allows SSO = enables users to log in without using AWS creds
+
+#####
+Identity Federation
+#####
+let users outside of AWS to assume temporary role for accessing AWS resources
+user assumes identity provided access role
+you do not need to create IAM users
+user management is handled outside of AWS
+
+user > login > 3rd party > temp creds > user > access AWS
+
+## SAML Federation for enterprise
+integrate Active Directory or SAML 2.0 compliant
+typically used by enterprises to manage their user accounts
+provides access via AWS Console or CLI via temp creds
+no need to create IAM user for each of your employees
+
+client app > SAML compliant identity provider > authenticate user based on 3rd party data base > return SAML assertion (aka token) > assume role to AWS STS > return temp security creds to client > login to AWS
+
+## Custom Identity Broker App for Enterprise
+only if ID provider not compatible with SAML 2.0
+the ID broken must determine the appropriate IAM policy
+no longer using a third party to manage users
+have to build custom tooling
+
+## AWS Cognito Federated Identity Pools
+For an app - mobile or web
+goal - provide direct access to AWS resources from the client side
+how?
+log in to federated ID provider 
+get temp AWS creds back from Federated Identity Pool
+these creds come with pre-defined IAM policy stating their perms
+
+use case
+provide temp access to S3 bucket using Facebook login
+
+####
+Policies
+####
+dynamically populate policy 
+${aws:username}
+${aws.FederatedProvider}
+
+suggested links:
+https://docs.aws.amazon.com/AmazonS3/latest/dev/example-bucket-policies.html
+https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/specifying-conditions.html
+
+####
+CloudTrail
+####
+track API call made to your account
+enabled by default
+can move logs from CloudTrail into CloudWatch logs to query
+if a resource is deleted look at CloudTrail to identify who did it
+
+stores data for past 90 days
+stores create, modify, delete events by default
+trails > choose additional trails
+stores events in S3 for further analysis (Athena)
+default SSE-S3 encryption
+control access to S3 using IAM + bucket policy
+
+#####
+VPC Endpoints
+#####
+enhance security of network within VPC
+using VPC endpoints = connect to AWS services using a private network instead of the public internet 
+uses route tables to link service
+scale horizontally 
+avoid having to stand up a NAT gateway yourself
+
+Gateway endpoints provision a target and must be used in aroute table
+only work for S3 and DynamoDB
+
+Interface provisions an ENI (private IP address) as an entry point and you must attach a security group
