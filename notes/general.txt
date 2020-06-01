@@ -1,0 +1,160 @@
+# Integrations 
+
+## IoT
+Topics > Rules > Rule Actions send data to other AWS services
+
+## Kinesis Data Analytics
+can use AWS Lambda functions to pre-process records
+
+sources 
+- kinesis data streams
+- kinesis data firehose
+- reference data (JSON, CSV) from S3
+
+output
+- kinesis data streams
+kinesis data firehose
+lambda function
+
+## SQS
+sources
+- SDK
+- IoT core rules engine
+- S3 events
+
+output
+- SDK
+- AWS lambda function
+
+## DynamoDB
+sources
+- SDK
+- DMS (Database Migration Service)
+- Data Pipeline
+
+output
+- DyanmoDB streams > Lambda or KCL
+- Glue gets all table metadata into data catalog
+- Hive can scan DBB from EMR
+
+## Glue
+sources
+- DDB
+- S3
+- JDBC 
+
+tooling
+- crawlers
+- glue data catalog
+
+data catalog used by
+- Redshift Spectrum
+- Athena
+- EMR
+
+## EMR
+contains
+- Hadoop
+- Presto
+- HBase
+- Spark
+- Hive
+- Pig
+- Flink
+- Jupyter
+- Zeppelin
+
+integrates with
+- S3/EMRFS
+- DDB
+- Apache Ranger on EC2 for EMR security
+- Glue Data Catalog
+
+## Amazon Machine Learning (ML)
+sources
+- S3
+- Redshift
+
+output
+- output from Predictions API
+
+## Amazon SageMaker
+includes
+- TensorFlow
+- PyTorch
+- MxNet
+
+source - S3 only
+
+## AWS Data Pipeline
+sources/activites from
+- S3
+- JDBC
+- EMR/Hive
+- DDB
+
+## ElasticSearch
+contains
+- elasticsearch
+- kibana
+- logstash
+
+sources
+- Kinesis Firehose
+- IoT Core
+- Cloudwatch Logs
+
+access controlled by
+- IAM
+- Cognito for Kibana 
+
+## Athena
+source - S3
+output - S3
+
+integrates with Quicksight
+
+## Redshift
+source - S3
+integrates with PostgreSQL via DBLink
+
+## Quicksight
+sources
+- RDS/JDBC
+- Redshift
+- Athena
+- S3
+
+# EC2 Instance Types
+General purpose = T or M
+
+Compute optimized = C
+for batch processing
+
+Memory optimized = R(AM), X, Z
+real time data analytics
+Spark
+
+Accelerate computing = P, G, F
+ML/Deep Learning
+TensorFlow, MxNet
+
+Storage optimized = H, I, D
+distributed file system (HDFS), MapReduce, Kafka, Redshift
+
+# EC2 in Big Data
+Spot - can tolerate loss, using service with checkpointing
+Reserved - long running clusters
+On Demand - all other scenarios
+
+# Exam Tips
+look for key words about requirements 
+do not skim through
+2.5 min per question
+flag questions for later review
+no penalty for guessing
+
+additional prep resources
+AWS Big Data White Paper
+AWS free online prep course
+exam overview from AWS
