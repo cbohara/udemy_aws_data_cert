@@ -236,7 +236,7 @@ Apache Hive
 ######
 write SQL like code over unstructured data 
 
-for EMR Hive sits on top of MapReduce + figures out how to distribute the processing of that SQL  on the underlying data in S3
+EMR Hive sits on top of MapReduce + figures out how to distribute the processing of that SQL  on the underlying data in S3
 
 provides interactive web interface to enter SQL queries
 even though it is interactive it isn't fast
@@ -284,11 +284,13 @@ advantages of HBase
 can also export Hbase to S3 and vice versa
 
 ######
-AWS Presto
+Presto
 ######
 can execute single SQL query over many different data stores at once (ex: joining tables in different systems)
 offers interactive queries at pedabyte scale
 similar to HBase, but even faster
+
+Apache Hive differs from Presto in that Hive uses MapReduce and therefore stores intermediate results on local disk while Presto does not use MapReduce and stores intermediate results in memory
 
 #####
 Zeppelin and EMR notebooks

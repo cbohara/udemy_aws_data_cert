@@ -246,8 +246,7 @@ ex: user ID
 ALL
 copy of the entire table is distributed on every node
 takes much longer to load the data
-only appropriate for slow moving tables that aren't updated frequently
-not good for small dimension tables
+only appropriate for small slow moving tables that aren't updated frequently
 
 # Redshift sort keys
 similar to indexes or indices in RDBS
@@ -283,6 +282,10 @@ can specify prefix to copy all files under
 also provide specific manifest file
 authorize via IAM roles or AWS key + secrete key 
 can decrypt data that is encrypted in S3 while COPYing 
+
+not a good idea to run COPY commands in parallel
+better to split your data into separate files no more than 1GB apiece and compress
+then load each file sequentially 
 
 if you need to load a "narrow" table (lots of rows, few columns) = use single COPY command
 
